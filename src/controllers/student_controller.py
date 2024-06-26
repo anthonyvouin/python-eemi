@@ -20,8 +20,6 @@ def read_root(body: Student):
 def get_student(identifier: str):
    return get_student_by_identifier(identifier)
     
-    
-
 #delete user by id  
 @router.delete("/{identifier}") 
 def delete_student(identifier: UUID):
