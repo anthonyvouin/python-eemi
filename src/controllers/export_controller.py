@@ -50,7 +50,13 @@ def read_root(format: str = "csv"):
 
         # Retourner les données dans le format demandé
         if format == "json":
-            return students
+            output = io.StringIO()
+            json.dump(students, output)
+            output.seek(0)
+
+            response = StreamingResponse(output, media_type="application/json")
+            response.headers["Content-Disposition"] = "attachment; filename=students.json"
+            return response
         
         elif format == "csv":
             output = io.StringIO()

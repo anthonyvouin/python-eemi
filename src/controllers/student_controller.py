@@ -12,7 +12,14 @@ router = APIRouter()
 # create a student
 @router.post("/")
 def read_root(body: Student):
+    if body.grades is not None:
+        for grade in body.grades:
+            grade.identifier =  uuid4()
+            
+    body.identifier = uuid4()
     add_student(body)
+
+
     return body.identifier
 
 #return a student by id
