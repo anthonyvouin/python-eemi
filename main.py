@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.config.db import create_database
-from controllers.home_controller import router as home_router
+from src.controllers.home_controller import router as home_router
 from src.controllers.student_controller import router as student_router
 from src.controllers.export_controller import router as export_router
 
