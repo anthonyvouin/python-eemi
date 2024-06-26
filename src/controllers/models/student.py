@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, conint
 from typing import List, Optional
 from uuid import UUID
+from .grade import Grade  
 
 
 class Student(BaseModel):
