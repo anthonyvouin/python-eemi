@@ -28,41 +28,56 @@ def read_root(body: Student):
 
 #return a student by id
 @router.get("/{identifier}")
-def get_student(identifier: UUID):
+def get_student(identifier: str):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Convertir l'UUID en chaîne
-        identifier_str = str(identifier)
-
         # Récupérer l'étudiant par son identifiant
         cursor.execute(
             '''SELECT id, first_name, last_name, email FROM student WHERE id = ?''',
-            (identifier_str,)
+            (identifier,)
         )
 
         result = cursor.fetchone()
-        conn.close()
-
         if result is None:
             raise HTTPException(status_code=404, detail="Student not found")
 
         # Créer un objet Student avec les données récupérées
-        student = Student(
-            identifier=UUID(result[0]),
-            first_name=result[1],
-            last_name=result[2],
-            email=result[3]
+        student = {
+            "id": result['id'],
+            "first_name": result['first_name'],
+            "last_name": result['last_name'],
+            "email": result['email'],
+            "grades": []
+        }
+
+        # Récupérer les grades de l'étudiant
+        cursor.execute(
+            '''SELECT id, course, score FROM grade WHERE student_id = ?''',
+            (identifier,)
         )
+
+        grades = []
+        for row in cursor.fetchall():
+            grade = {
+                "id": row['id'],
+                "course": row['course'],
+                "score": row['score']
+            }
+            grades.append(grade)
+
+        conn.close()
+
+        # Ajouter les grades à l'objet Student
+        student["grades"] = grades
 
         return student
 
     except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail="An error occurred while retrieving the student from the database")
+        raise HTTPException(status_code=500, detail="An error occurred while retrieving the student and grades from the database")
     
-   
-
+    
 
 #delete user by id  
 @router.delete("/{identifier}") 
