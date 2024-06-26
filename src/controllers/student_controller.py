@@ -68,3 +68,42 @@ def get_student(identifier: UUID):
 
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail="An error occurred while retrieving the student from the database")
+    
+   
+# service pour check user exist
+def check_student_exists(identifier: UUID):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        '''SELECT id FROM student WHERE id = ?''',
+        (str(identifier),)
+    )
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+
+
+#delete user by id
+@router.delete("/{identifier}")
+def delete_student(identifier: UUID):
+    try:
+        if not check_student_exists(identifier):
+            raise HTTPException(status_code=404, detail="Student not found")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Supprimer l'étudiant
+        cursor.execute(
+            '''DELETE FROM student WHERE id = ?''',
+            (str(identifier),)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return {"message": f"Student with id {identifier} has been deleted successfully"}
+
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail="An error occurred while deleting the student from the database")
