@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response
 from ..models.student import Student
+from ..models.grade import Grade
 from ..config.db import get_db_connection
-
 from ..services.student_service import addStudent, check_student_exists
 from uuid import UUID, uuid4
 import sqlite3
@@ -24,7 +24,6 @@ def read_root(body: Student):
 
 
 #return a student by id
-#TODO si c'est pas un UUID, il faut retourner une erreur
 @router.get("/{identifier}")
 def get_student(identifier: str):
     try:
@@ -123,3 +122,35 @@ def delete_student(identifier: UUID):
     finally:
         conn.close()
 
+
+# recuperer une note d'un etudiant
+@router.get("/{student_id}/grades/{grade_id}", response_model=Grade)
+def get_grade(student_id: str, grade_id: str):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Récupérer le grade spécifique par son identifiant et celui de l'étudiant
+        cursor.execute(
+            '''SELECT id, student_id, course, score FROM grade WHERE student_id = ? AND id = ?''',
+            (student_id, grade_id)
+        )
+
+        result = cursor.fetchone()
+        conn.close()
+
+        if result is None:
+            raise HTTPException(status_code=404, detail="Grade not found")
+
+        # Créer un objet Grade avec les données récupérées
+        grade = Grade(
+            identifier=result['id'],  # Assurez-vous d'utiliser 'identifier' ici
+            student_id=result['student_id'],
+            course=result['course'],
+            score=result['score']
+        )
+
+        return grade
+
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail="An error occurred while retrieving the grade from the database")
