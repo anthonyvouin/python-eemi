@@ -12,31 +12,17 @@ def create_jwt_token(username: str) -> str:
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
-
-def verify_jwt_token(authorization: str = Header(None)):
-    if authorization is None:
-        raise HTTPException(status_code=401, detail="Missing authorization header")
-    parts = authorization.split()
-    if parts[0].lower() != "bearer":
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
-    elif len(parts) == 1:
-        raise HTTPException(status_code=401, detail="Token not found")
-    elif len(parts) > 2:
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
-    token = parts[1]
-    return token
-
-
 def get_current_user(authorization: str = Header(None)):
     if authorization is None:
         raise HTTPException(status_code=401, detail="Missing authorization header")
     parts = authorization.split()
+    print(len(parts))
     if parts[0].lower() != "bearer":
+        print('get current user')
         raise HTTPException(status_code=401, detail="Invalid authorization header")
+        
     elif len(parts) == 1:
         raise HTTPException(status_code=401, detail="Token not found")
-    elif len(parts) > 2:
+    elif len(parts) > 3:
         raise HTTPException(status_code=401, detail="Invalid authorization header")
-    token = parts[1]
-    payload = verify_jwt_token(token)
-    return payload
+    return 'ok'
