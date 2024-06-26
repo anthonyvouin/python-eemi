@@ -71,6 +71,7 @@ class TestStudentManagement:
         assert delete_student(identifier) == 200
         # Comme on a supprimé l'étudiant, on ne doit pas pouvoir le récupérer
         assert delete_student(identifier) == 404
+        pass
 
 if __name__ == "__main__":
     pytest.main()
