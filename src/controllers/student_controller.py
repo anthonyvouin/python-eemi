@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from ..models.student import Student
 from ..config.db import get_db_connection
 
-from ..services.student_service import addStudent
+from ..services.student_service import addStudent, check_student_exists
 from uuid import UUID, uuid4
 import sqlite3
+import json
 
 router = APIRouter()
 
@@ -25,74 +26,100 @@ def read_root(body: Student):
 #return a student by id
 #TODO si c'est pas un UUID, il faut retourner une erreur
 @router.get("/{identifier}")
-def get_student(identifier: UUID):
+def get_student(identifier: str):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        # Convertir l'UUID en chaîne
-        identifier_str = str(identifier)
 
         # Récupérer l'étudiant par son identifiant
         cursor.execute(
             '''SELECT id, first_name, last_name, email FROM student WHERE id = ?''',
-            (identifier_str,)
+            (identifier,)
         )
 
         result = cursor.fetchone()
-        conn.close()
-
         if result is None:
             raise HTTPException(status_code=404, detail="Student not found")
 
         # Créer un objet Student avec les données récupérées
-        student = Student(
-            identifier=UUID(result[0]),
-            first_name=result[1],
-            last_name=result[2],
-            email=result[3]
+        student = {
+            "id": result['id'],
+            "first_name": result['first_name'],
+            "last_name": result['last_name'],
+            "email": result['email'],
+            "grades": []
+        }
+
+        # Récupérer les grades de l'étudiant
+        cursor.execute(
+            '''SELECT id, course, score FROM grade WHERE student_id = ?''',
+            (identifier,)
         )
+
+        grades = []
+        for row in cursor.fetchall():
+            grade = {
+                "id": row['id'],
+                "course": row['course'],
+                "score": row['score']
+            }
+            grades.append(grade)
+
+        conn.close()
+
+        # Ajouter les grades à l'objet Student
+        student["grades"] = grades
 
         return student
 
     except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail="An error occurred while retrieving the student from the database")
+        raise HTTPException(status_code=500, detail="An error occurred while retrieving the student and grades from the database")
     
-   
-# service pour check user exist
-def check_student_exists(identifier: UUID):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        '''SELECT id FROM student WHERE id = ?''',
-        (str(identifier),)
-    )
-    result = cursor.fetchone()
-    conn.close()
-    return result is not None
+    
 
-
-
-#delete user by id
-@router.delete("/{identifier}")
+#delete user by id  
+@router.delete("/{identifier}") 
 def delete_student(identifier: UUID):
-    try:
-        if not check_student_exists(identifier):
-            raise HTTPException(status_code=404, detail="Student not found")
+    # Vérifier d'abord si l'étudiant existe
+    if not check_student_exists(identifier):
+        response = Response(content=json.dumps({"message": "Student not found"}), media_type='application/json')
+        response.status_code = 404
+        return response
 
+    try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Supprimer l'étudiant
-        cursor.execute(
-            '''DELETE FROM student WHERE id = ?''',
-            (str(identifier),)
-        )
+        # Commencer une transaction
+        conn.execute("BEGIN")
 
-        conn.commit()
+        try:
+            # Supprimer d'abord les notes associées à l'étudiant
+            cursor.execute(
+                '''DELETE FROM grade WHERE student_id = ?''',
+                (str(identifier),)
+            )
+            grades_deleted = cursor.rowcount
+
+            # Ensuite, supprimer l'étudiant
+            cursor.execute(
+                '''DELETE FROM student WHERE id = ?''',
+                (str(identifier),)
+            )
+
+            # Valider la transaction
+            conn.commit()
+
+            return {
+                "message": f"Student with id {identifier} has been deleted successfully",
+                "grades_deleted": grades_deleted
+            }
+
+        except sqlite3.Error as e:
+            # En cas d'erreur, annuler la transaction
+            conn.rollback()
+            raise HTTPException(status_code=500, detail="An error occurred while deleting the student and associated grades from the database")
+
+    finally:
         conn.close()
 
-        return {"message": f"Student with id {identifier} has been deleted successfully"}
-
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail="An error occurred while deleting the student from the database")

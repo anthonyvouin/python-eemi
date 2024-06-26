@@ -2,6 +2,8 @@ from ..models.student import Student
 from fastapi import APIRouter, HTTPException
 from ..config.db import get_db_connection
 import sqlite3
+from uuid import UUID, uuid4
+
 
 
 def addStudent(body: Student): 
@@ -29,3 +31,20 @@ def addStudent(body: Student):
     except sqlite3.Error as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while inserting the student into the database.")
+
+
+
+# service pour check user exist
+def check_student_exists(identifier: UUID):
+    print(identifier)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        '''SELECT id FROM student WHERE id = ?''',
+        (str(identifier),)
+    )
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+
