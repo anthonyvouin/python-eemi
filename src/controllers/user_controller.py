@@ -37,7 +37,6 @@ def createAccount(body: User):
         raise HTTPException(status_code=500, detail="An error occurred while inserting the student into the database.")
 
 
-
 @router.post("/login")
 def login(body: User):
     try:
@@ -54,7 +53,7 @@ def login(body: User):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        stored_password = user['password'].encode('utf-8')
+        stored_password = user['password']  # Le mot de passe est déjà en bytes
 
         if bcrypt.checkpw(body.password.encode('utf-8'), stored_password):
             return {"message": "Login successful"}
@@ -66,4 +65,3 @@ def login(body: User):
         raise HTTPException(status_code=500, detail="An error occurred while querying the database.")
     finally:
         conn.close()
-
