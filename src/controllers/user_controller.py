@@ -1,16 +1,16 @@
 
-from fastapi import APIRouter,HTTPException, Response, Header
+from fastapi import APIRouter,HTTPException, Response, Header, Depends
 from ..models.user import User
 from uuid import UUID, uuid4
 from ..config.db import get_db_connection
-from ..services.user_service import get_token, create_jwt_token
+from ..services.user_service import  create_jwt_token
 import sqlite3
 import bcrypt
 import json
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("/", )
 def create_account(body: User):
     try:
         identifier = uuid4()

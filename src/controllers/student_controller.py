@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Depends
 from ..models.student import Student
 from ..models.grade import Grade
+
 from ..config.db import get_db_connection
 from ..services.student_service import add_student, check_student_exists, get_student_by_identifier, delete_student_by_identifier, get_grade_by_student, delete_grade_by_student
+from ..services.user_service import  create_jwt_token, get_current_user
+
 from uuid import UUID, uuid4
 import sqlite3
 import json
@@ -10,7 +13,7 @@ import json
 router = APIRouter()
 
 # create a student
-@router.post("/")
+@router.post("/", dependencies=[Depends(get_current_user)])
 def read_root(body: Student):
     add_student(body)
     return body.identifier
