@@ -35,6 +35,36 @@ def read_root(body: Student):
 
 
 #return a student by id
-@router.get("/")
-def read_root():
-   return "coucou"
+@router.get("/{identifier}")
+def get_student(identifier: UUID):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Convertir l'UUID en chaîne
+        identifier_str = str(identifier)
+
+        # Récupérer l'étudiant par son identifiant
+        cursor.execute(
+            '''SELECT id, first_name, last_name, email FROM student WHERE id = ?''',
+            (identifier_str,)
+        )
+
+        result = cursor.fetchone()
+        conn.close()
+
+        if result is None:
+            raise HTTPException(status_code=404, detail="Student not found")
+
+        # Créer un objet Student avec les données récupérées
+        student = Student(
+            identifier=UUID(result[0]),
+            first_name=result[1],
+            last_name=result[2],
+            email=result[3]
+        )
+
+        return student
+
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail="An error occurred while retrieving the student from the database")
