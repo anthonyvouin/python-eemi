@@ -8,9 +8,6 @@ import sqlite3
 
 router = APIRouter()
 
-
-
-
 # create a student
 @router.post("/")
 def read_root(body: Student):
@@ -26,6 +23,7 @@ def read_root(body: Student):
 
 
 #return a student by id
+#TODO si c'est pas un UUID, il faut retourner une erreur
 @router.get("/{identifier}")
 def get_student(identifier: UUID):
     try:

@@ -19,9 +19,9 @@ def addStudent(body: Student):
         for grade in body.grades:
             print(grade)
             cursor.execute(
-            '''INSERT INTO grade (id, student_id, course, score) VALUES (?, ?, ?, ?)''',
-            (str(grade.identifier), str(body.identifier), grade.course, grade.score)
-    )
+                '''INSERT INTO grade (id, student_id, course, score) VALUES (?, ?, ?, ?)''',
+                (str(grade.identifier), str(body.identifier), grade.course, grade.score)
+            )
 
         conn.commit()
         conn.close()
