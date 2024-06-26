@@ -36,5 +36,32 @@ def createAccount(body: User):
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while inserting the student into the database.")
 
-    
 
+@router.post("/login")
+def login(body: User):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            '''SELECT id, username, password FROM user WHERE username = ?''',
+            (body.username,)
+        )
+
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        stored_password = user['password']  # Le mot de passe est déjà en bytes
+
+        if bcrypt.checkpw(body.password.encode('utf-8'), stored_password):
+            return {"message": "Login successful"}
+        else:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    except sqlite3.Error as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="An error occurred while querying the database.")
+    finally:
+        conn.close()
