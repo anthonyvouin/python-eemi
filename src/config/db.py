@@ -21,6 +21,12 @@ def create_database():
         score INTEGER NOT NULL CHECK(score >= 0 AND score <= 100),
         FOREIGN KEY (student_id) REFERENCES student (id)
     )''')
+    
+    cur.execute('''CREATE TABLE IF NOT EXISTS user (
+        id TEXT PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+    )''')
 
     con.commit()
 
