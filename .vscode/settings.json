@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "api",
+            "database": "${workspaceFolder:python-eemi}/api.sql"
+        }
+    ]
+}
