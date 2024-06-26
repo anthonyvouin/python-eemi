@@ -1,9 +1,8 @@
 from pydantic import BaseModel
+from typing import Optional
+from uuid import UUID
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
-
-class UserLogin(BaseModel):
+class User(BaseModel):
+    identifier: Optional[UUID] = None
     username: str
     password: str
