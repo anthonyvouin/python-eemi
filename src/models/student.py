@@ -5,7 +5,7 @@ from .grade import Grade
 
 
 class Student(BaseModel):
-    identifier: UUID
+    identifier: Optional[UUID] = None
     first_name: str
     last_name: str
     email: EmailStr
