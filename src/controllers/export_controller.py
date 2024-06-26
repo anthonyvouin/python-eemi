@@ -13,39 +13,42 @@ router = APIRouter()
 
 # Get an export from all the data in the database
 @router.get("/{format}")
-def read_root(format: str):
+@router.get("/")
+def read_root(format: str = "csv"):
+    format = format.lower()
+    
     try:
         conn = get_db_connection()
         cursorStudent = conn.cursor()
         cursorGrade = conn.cursor()
 
-        # Get all data from the database
+        # Récupérer les données de la base de données
         cursorStudent.execute("SELECT * FROM student")
         cursorGrade.execute("SELECT * FROM grade")
 
         rowsStudent = cursorStudent.fetchall()
         rowsGrade = cursorGrade.fetchall()
 
-        # Create a list of students
+        # Créer la liste des étudiants
         students = []
         for rowStudent in rowsStudent:
             student = dict(rowStudent) # On transforme l'élément de type Row en dictionnaire pour pouvoir l'utiliser après
             students.append(student)
         
-        # Create a list of grades
+        # Créer la liste des notes
         grades = []
         for rowGrade in rowsGrade:
             grade = dict(rowGrade) # On transforme l'élément de type Row en dictionnaire pour pouvoir l'utiliser après
             grades.append(grade)
 
-        # Associate the grades with the students
+        # On associe les notes aux étudiants
         for student in students:
             student["grades"] = []
             for grade in grades:
                 if student["id"] == grade["student_id"]:
                     student["grades"].append(grade["score"])
 
-        # Return the data in the requested format
+        # Retourner les données dans le format demandé
         if format == "json":
             return students
         
