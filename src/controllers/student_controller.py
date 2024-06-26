@@ -125,7 +125,8 @@ def delete_student(identifier: UUID):
 
 # recuperer une note d'un etudiant
 @router.get("/{student_id}/grades/{grade_id}", response_model=Grade)
-def get_grade(student_id: str, grade_id: str):
+def get_grade(student_id: str, grade_id: str):   
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -154,3 +155,48 @@ def get_grade(student_id: str, grade_id: str):
 
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail="An error occurred while retrieving the grade from the database")
+    
+    
+#supprimer une note d'un etudiant en fonction de l'id de l"etudiant
+@router.delete("/{student_id}/grades/{grade_id}")
+def delete_grade(student_id: UUID, grade_id: UUID):
+    # Vérifier si l'étudiant existe
+    if not check_student_exists(student_id):
+        response = Response(content=json.dumps({"message": "Student not found"}), media_type='application/json')
+        response.status_code = 404
+        return response
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Vérifier si la note existe et appartient à l'étudiant
+        cursor.execute(
+            '''SELECT id FROM grade WHERE id = ? AND student_id = ?''',
+            (str(grade_id), str(student_id))
+        )
+        result = cursor.fetchone()
+
+        if result is None:
+            response = Response(content=json.dumps({"message": "Grade not found"}), media_type='application/json')
+            response.status_code = 404
+            return response
+
+        # Supprimer la note
+        cursor.execute(
+            '''DELETE FROM grade WHERE id = ?''',
+            (str(grade_id),)
+        )
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": f"Grade with id {grade_id} for student {student_id} has been deleted successfully"
+        }
+
+    except sqlite3.Error as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail="An error occurred while deleting the grade from the database")
+
+    finally:
+        conn.close()
