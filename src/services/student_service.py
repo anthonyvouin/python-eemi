@@ -6,7 +6,6 @@ import sqlite3
 from uuid import UUID, uuid4
 import json
 
-
 # pour créer un étudiant avec ses notes
 def add_student(body: Student): 
     try:

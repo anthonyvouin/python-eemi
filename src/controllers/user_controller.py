@@ -10,7 +10,7 @@ import json
 
 router = APIRouter()
 
-@router.post("/", )
+@router.post("/")
 def create_account(body: User):
     try:
         identifier = uuid4()

@@ -16,8 +16,23 @@ def student_data():
         ]
     }
 
+def create_admin():
+    body = {
+        "username": "admin_for_test",
+        "password": "password_admin_for_test"
+    }
+    response = requests.post(f"{BASE_URL}/user/", json=body)
+    response.raise_for_status()
+    return response.json()
+
 def create_student(student_data):
-    response = requests.post(f"{BASE_URL}/student/", json=student_data)
+    bearer = student_data['bearer']
+
+    print(bearer)
+    headers = {
+        "Authorization": f"Bearer {bearer}"
+    }
+    response = requests.post(f"{BASE_URL}/student/", json=student_data, headers=headers)
     response.raise_for_status()
     return response.json()
 
@@ -43,6 +58,14 @@ def delete_one_grade_from_one_student(student_identifier, grade_identifier):
 class TestStudentManagement:
 
     def test_create_get_delete_student_with_multiple_grades(self, student_data):
+
+        admin = create_admin()
+
+        access_token = admin["access_token"]
+        token_type = admin["token_type"]
+
+        student_data['bearer'] = f'{token_type} {access_token}'
+        
         # Créer un étudiant
         identifier = create_student(student_data)
         
