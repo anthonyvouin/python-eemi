@@ -21,8 +21,15 @@ def create_admin():
         "username": "admin_for_test",
         "password": "password_admin_for_test"
     }
-    response = requests.post(f"{BASE_URL}/user/", json=body)
-    response.raise_for_status()
+    try:
+        response = requests.post(f"{BASE_URL}/user/", json=body)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 500:
+            response = requests.post(f"{BASE_URL}/user/login", json=body)
+            response.raise_for_status()
+        else:
+            raise e
     return response.json()
 
 def create_student(student_data):
