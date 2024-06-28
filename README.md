@@ -27,7 +27,7 @@ L'API sera accessible à l'adresse suivante : http://127.0.0.1:8000.
 
 Pour accéder aux différentes routes de notre API, un swagger a été mis en place grâce à l'utilisation de FastAPI.
 
-Pour y accéder [cliquer ici](http://127.0.0.1:8000)
+Pour y accéder [cliquer ici](http://127.0.0.1:8000/docs)
 
 
 ---
