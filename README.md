@@ -56,6 +56,6 @@ poetry run pytest
 ---
 ## Choix de la base de données 
 
-Nous aurions pu utiliser un JSON, mais moins intéressant d'un point de vue performance. 
-Nous aurions pu également utiliser du NoSQL, mais ceci n'était pas intéressant, dans le sens où nous devions créer des relations entre les utilisateurs et les notes.
+Nous aurions pu utiliser un JSON, mais moins intéressant d'un point de vue performance.  
+Nous aurions pu également utiliser du NoSQL, mais ceci n'était pas intéressant, dans le sens où nous devions créer des relations entre les utilisateurs et les notes.  
 Au fianl, pour ce projet nous avons utilisé SQLite pour pouvoirs faire des jointure mais aussi pour sa légéreté et sa simplicité de mise en place.
