@@ -69,9 +69,8 @@ class TestStudentManagement:
         admin = create_admin()
 
         access_token = admin["access_token"]
-        token_type = admin["token_type"]
 
-        student_data['bearer'] = f'{token_type} {access_token}'
+        student_data['bearer'] = f'{access_token}'
         
         # Créer un étudiant
         identifier = create_student(student_data)
