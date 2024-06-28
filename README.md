@@ -40,9 +40,9 @@ Pour le début du projet :
 
 3. Récuperer le token lors de la connection
 
-4. Sur PostMan (ou autre app...) Renseigner le token avec bearer token lors de l'utilisation de la route pour créer un étudiant. 
+4. Sur PostMan (ou autre app...) Renseigner le token lors de l'utilisation sur la route POST. 
 
-Exemple : bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsYWxhYWEiLCJleHAiOjE3MTk0MTg5MTh9.Mj3pVPhuStLyB67enEytsruwRBI98fr4S_eMNddoWl4
+Exemple : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsYWxhYWEiLCJleHAiOjE3MTk0MTg5MTh9.Mj3pVPhuStLyB67enEytsruwRBI98fr4S_eMNddoWl4
 
 ---
 

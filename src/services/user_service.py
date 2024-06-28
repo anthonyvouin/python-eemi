@@ -16,12 +16,9 @@ def get_current_user(authorization: str = Header(None)):
     if authorization is None:
         raise HTTPException(status_code=401, detail="Missing authorization header")
     parts = authorization.split()
-    print(len(parts))
-    if parts[0].lower() != "bearer":
-        print('get current user')
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
+    
         
-    elif len(parts) == 1:
+    if len(parts) == 1:
         raise HTTPException(status_code=401, detail="Token not found")
     elif len(parts) > 3:
         raise HTTPException(status_code=401, detail="Invalid authorization header")
