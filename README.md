@@ -62,7 +62,7 @@ Au fianl, pour ce projet nous avons utilisé SQLite pour pouvoirs faire des join
 
 ## Les participants au projet
 
-Anthony Vouin
-Charline Royer
-Sébastian Onise
-Matthias Faucon
+* Anthony Vouin
+* Charline Royer
+* Sébastian Onise
+* Matthias Faucon
